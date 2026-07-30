@@ -3,8 +3,11 @@
   @brief    Source file for OpenGL BOUNCE demo
 */
 #include "bounce.h"
+#include "resource.h"
 
+#include <util-file.h>
 #include <util-str.h>
+#include <ogl-std.h>
 #include <win-std.h>
 
 #define APP_COPYRIGHT   L"© 2026"
@@ -13,7 +16,10 @@
 #define APP_TITLE       L"BOUNCE"
 #define APP_VERSION     L"0.0.0"
 
+static BENCH    bench = {0};
+
 // static prototypes
+static void Defaults(void);
 static void Run(void);
 static BOOL Settings(const BOOL read);
 static BOOL Start(void);
@@ -41,11 +47,16 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE previous, LPWSTR cmd, int show
     return(0);
 }
 
+/* set game default configuration for first-time play */
+static void Defaults(void)
+{
+    // TODO - fill in defaults
+}
+
 /* perform game algorithm */
 static void Run(void)
 {
     Draw();
-    Input();
     Update();
     Benchmark(&bench);
 }
@@ -55,17 +66,18 @@ static BOOL Settings(const BOOL read)
 {
     CFILE   cf = {0};
     wchar_t dir[STR_PATH] = {0};
-    long    mode = ((read == TRUE) ? FILE_READ : FILE_WRITE);
+    long    mode = (read ? FILE_READ : FILE_WRITE);
     BOOL    success = FALSE;
 
-    if(FolderApp(dir, sizeof(dir), L"%s", APP_PATH_DAT) == TRUE)
+    if(FolderApp(dir, sizeof(dir), L"%s", APP_PATH_DAT))
     {
-        if(FileOpen(mode, dir, &cf) == TRUE)
+        if(FileOpen(mode, dir, &cf))
         {
-            if(read == TRUE)
+            if(read)
             {
                 success = (FileRead(cf, &app, sizeof(app)) == sizeof(app));
             }else{
+                // we reset the termination bool to false so the app won't auto-kill upon new start up
                 app.over = FALSE;
                 success = (FileWrite(cf, &app, sizeof(app)) == sizeof(app));
             }
@@ -82,43 +94,31 @@ static BOOL Start(void)
 {
     BOOL    success = FALSE;
 
-    // open the log file
-    if(Logging(TRUE))
+    // apply application icon to window
+    if(WindowIcon(IDI_BOUNCE, &wnd))
     {
-        // apply application icon to window
-        if(WindowIcon(IDI_CUBED, &wnd))
+        // set up the game struct based off saved settings
+        if(!Settings(TRUE))
         {
-            // set up the game struct based off saved settings
-            if(Settings(TRUE) == FALSE)
-            {
-                // unable to load saved settings, use defaults
-                Defaults();
-            }
+            // unable to load saved settings, use defaults
+            Defaults();
+        }
 
-            // set up graphics, audio, and bluetooth
-            if(Graphics(TRUE) == TRUE)
-            {
-                Logic();
-                Blu(TRUE);
-                Audio(TRUE);
-                app.debug = TRUE;
-                success = TRUE;
-            }
+        // set up graphics, audio, and bluetooth
+        if(Graphics(TRUE))
+        {
+            // TODO - load up the logic if necessary
+            success = TRUE;
         }
     }
 
     return(success);
 }
 
-/* perform game cleanup */
+/* perform demo cleanup */
 static void Stop(void)
 {
-    Audio(FALSE);
-    Blu(FALSE);
-
     Graphics(FALSE);
-    StateClear();
     Settings(FALSE);
     WindowKill(&wnd);
-    LogFile(NULL);
 }

@@ -21,4 +21,18 @@ WNDW    wnd;
 */
 void Draw(void);
 
+/**
+  @brief            load or unload graphics
+  @param[in]        load boolean value to load or destroy graphics abilities
+  @return           TRUE if successfully loaded or destroyed graphics; FALSE otherwise
+*/
+BOOL Graphics(const BOOL load);
+
+/**
+  @fn               void Update(void)
+  @brief            update logic for the next scene to draw
+
+  */
+void Update(void);
+
 #endif
