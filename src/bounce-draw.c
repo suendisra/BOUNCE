@@ -26,7 +26,7 @@ void Draw(void)
     ClearGL(PoolColor(COLOR_BACK, colors));
     ViewSet(&view);
 
-    // TODO
+    // TODO - draw the scene
 
     PresentGL();
 }

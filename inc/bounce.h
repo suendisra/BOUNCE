@@ -8,6 +8,21 @@
 #include <util-std.h>
 #include <win-std.h>
 
+// bring in appropriate version of library
+#ifndef _DEBUG
+#pragma comment(lib, "UTIL.lib")
+#pragma comment(lib, "GPH.lib")
+#pragma comment(lib, "NET.lib")
+#pragma comment(lib, "WIN.lib")
+#pragma comment(lib, "OGL.lib")
+#else
+#pragma comment(lib, "UTILD.lib")
+#pragma comment(lib, "GPHD.lib")
+#pragma comment(lib, "NETD.lib")
+#pragma comment(lib, "WIND.lib")
+#pragma comment(lib, "OGLD.lib")
+#endif
+
 struct
 {
     BOOL    over;
